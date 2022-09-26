@@ -29,7 +29,11 @@ module.exports = {
             const authenticated = bcrypt.compareSync(password, user.password)
 
             if(authenticated){
-                res.status(200).send({username: user.username, firstName: user.first_name, lastName: user.last_name, userId: user.user_id})
+                const userInfo = {username: user.username, firstName: user.first_name, lastName: user.last_name, userId: user.user_id}
+                console.log(req.session)
+                req.session.user = userInfo
+                console.log(req.session)
+                res.status(200).send(userInfo)
             } else {
                 res.status(401).send('wrong password')
             }
@@ -47,7 +51,16 @@ module.exports = {
             `)
 
             // console.log(newUser)
+            req.session.user = newUser
             res.status(200).send(newUser)
+        }
+    },
+    checkUser: (req, res) => {
+        console.log('hit checkUser', req.session.user)
+        if(req.session.user){
+            res.status(200).send(req.session.user)
+        } else {
+            res.status(500).send('there is no user logged in')
         }
     }
 }
